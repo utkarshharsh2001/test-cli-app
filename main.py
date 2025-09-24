@@ -1,13 +1,23 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from app.api.endpoints import router
 from app.models.database import create_tables
+
+# Lifespan event handler
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    create_tables()
+    yield
+    # Shutdown (if needed)
 
 # Create FastAPI app
 app = FastAPI(
     title="Levo CLI API - Schema Upload and Versioning",
     description="API for uploading, versioning, and managing OpenAPI schemas",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Add CORS middleware
@@ -21,11 +31,6 @@ app.add_middleware(
 
 # Include API router
 app.include_router(router)
-
-# Create database tables on startup
-@app.on_event("startup")
-def startup_event():
-    create_tables()
 
 @app.get("/")
 def read_root():

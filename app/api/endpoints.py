@@ -106,7 +106,7 @@ async def get_schema_content(
         raise HTTPException(status_code=404, detail="Schema not found")
 
     try:
-        schema_info = SchemaInfo.from_orm(schema_record)
+        schema_info = SchemaInfo.model_validate(schema_record)
         content = await schema_service.get_schema_content(schema_info)
         return {
             "schema_info": schema_info,

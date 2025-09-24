@@ -121,7 +121,7 @@ class SchemaService:
             db.commit()
             db.refresh(schema_record)
 
-            schema_info = SchemaInfo.from_orm(schema_record)
+            schema_info = SchemaInfo.model_validate(schema_record)
 
             return UploadResponse(
                 success=True,
@@ -179,7 +179,7 @@ class SchemaService:
             return None
 
         return SchemaResponse(
-            schema_info=SchemaInfo.from_orm(schema_record),
+            schema_info=SchemaInfo.model_validate(schema_record),
             application=application,
             service=service
         )
@@ -215,7 +215,7 @@ class SchemaService:
             query = query.filter(Schema.service_id.is_(None))
 
         schemas = query.order_by(desc(Schema.version)).all()
-        return [SchemaInfo.from_orm(schema) for schema in schemas]
+        return [SchemaInfo.model_validate(schema) for schema in schemas]
 
     async def get_schema_content(self, schema_info: SchemaInfo) -> Dict[Any, Any]:
         """Load schema content from file"""

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
@@ -20,12 +20,11 @@ class ApplicationUpdate(BaseModel):
     description: Optional[str] = None
 
 class Application(ApplicationBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     created_at: datetime
     updated_at: datetime
-
-    class Config:
-        from_attributes = True
 
 # Service schemas
 class ServiceBase(BaseModel):
@@ -40,13 +39,12 @@ class ServiceUpdate(BaseModel):
     description: Optional[str] = None
 
 class Service(ServiceBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     application_id: int
     created_at: datetime
     updated_at: datetime
-
-    class Config:
-        from_attributes = True
 
 # Schema schemas
 class SchemaBase(BaseModel):
@@ -63,6 +61,8 @@ class SchemaUpload(BaseModel):
     replace_existing: bool = False
 
 class SchemaInfo(SchemaBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     version: int
     file_path: str
@@ -72,9 +72,6 @@ class SchemaInfo(SchemaBase):
     application_id: int
     service_id: Optional[int]
     created_at: datetime
-
-    class Config:
-        from_attributes = True
 
 class SchemaResponse(BaseModel):
     schema_info: SchemaInfo
