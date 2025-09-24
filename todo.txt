@@ -1,0 +1,80 @@
+Coding Exercise - Upload/Version Schema API
+•
+
+Last updated 9/2/25 at 12:34 pm
+Context
+
+
+Levo.ai is an automated pen-testing tool that runs in CI/CD pipelines and uncovers sophisticated business logic vulnerabilities present in modern API-driven applications.
+
+
+
+To achieve this goal, Levo.ai has built a CLI tool that can run in developers' laptops as well as in CI/CD pipelines. This CLI focus is around testing API by analyzing the schema and executing different kinds of conformance and security test suites.
+
+
+
+The CLI supports different test suites depending on whether if it's running based on local filesystem API schemas or if it's running based on schemas coming from the SaaS platform.
+
+
+
+Levo CLI has different commands but for this exercise, we'll focus on two of them:
+
+levo import --spec /path/to/openapi.[yaml|json] --application app-name [--service service-name]
+
+levo test --application app-name [--service service-name]
+
+
+
+Here are the options:
+
+--spec Path to the schema file on the local filesystem
+
+--application The application where the schema will be uploaded to
+
+--service Service where the schema will be uploaded to  Optional
+
+When no service is provided the API belongs to the application level
+
+
+
+When the levo import command is run, CLI is making a call to the SaaS to import the API specification at a service/application level. When the levo test command is run, it fetches the latest specification from SaaS again along with the test plans to be run. When the test results are shown in the UI after the test run, the schema that was used in testing should be shown in the results page too.
+
+
+
+For the scope of this exercise, application and service are entities where application is the parent of service.
+
+Timeline
+Please don't spend more than 4-5 hours on this exercise. Our goal isn't to achieve perfection, it's merely to get a better window into your thinking process and hands-on in coding.
+
+
+
+Deliverable
+API implementation for:
+
+Upload schemas/API specs from CLI
+
+Validate the Schema/API Spec before upload
+
+Example Input Schema/API Spec (json|yaml)
+
+https://github.com/levoai/demo-apps/blob/main/crAPI/api-specs/openapi.json
+
+https://github.com/levoai/demo-apps/blob/main/MalSchema/app/openapi.yaml
+
+Make sure any kind of specs [json|yaml] can be uploaded
+
+Use a database (like SQLite or anything you are familiar with)
+
+Version the uploaded schemas/API specs to make sure we retain the previous schemas/API Specs
+
+Ability to replace schema for an existing application/service
+
+Get Latest or the older versions of the schema
+
+Persisting Open API Schema Files [json|yaml] backed by a file system/file store
+
+A couple of unit tests to ensure the application/service along with a schema is uploaded
+
+Make sure the application and APIs are executable with a clear README
+
+Clean and Readable CODE please

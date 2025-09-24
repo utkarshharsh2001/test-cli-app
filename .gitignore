@@ -1,0 +1,22 @@
+# Python compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+
+# Database files
+*.db
+
+# Storage for responses
+storage/
+
+# IDE files
+.idea/
+
+# Test cache
+.pytest_cache/
+
+# OS files
+.DS_Store

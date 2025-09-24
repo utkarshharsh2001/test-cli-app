@@ -1,0 +1,26 @@
+# Core FastAPI stack
+fastapi==0.117.1
+uvicorn==0.37.0
+pydantic==2.11.9
+
+# Database
+SQLAlchemy==2.0.43
+
+# CLI interface
+click==8.3.0
+
+# File handling and validation
+PyYAML==6.0.2
+aiofiles==24.1.0
+jsonschema==4.25.1
+
+# HTTP requests (for CLI to API communication)
+requests==2.32.5
+
+# File upload support for FastAPI
+python-multipart==0.0.20
+
+# Testing
+pytest==8.4.2
+pytest-asyncio==1.2.0
+httpx==0.28.1
