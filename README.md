@@ -6,233 +6,157 @@ This system implements a CLI tool and API for uploading, versioning, and managin
 
 ## Components
 
-### 1. Database Layer (SQLite)
-- **Applications**: Parent entities
-- **Services**: Child entities under applications  
-- **Schemas**: Versioned OpenAPI specs linked to applications/services
-- **Schema Files**: File metadata and storage paths
-
-### 2. API Layer (FastAPI)
-- Upload schema endpoints
-- Schema validation
-- Version management
-- Retrieval endpoints
-
-### 3. CLI Layer (Click)
-- `levo import` command
-- `levo test` command
-- Schema validation before upload
-
-### 4. File Storage
-- Organized by application/service
-- Supports JSON and YAML formats
-- Version-based file naming
-
-## Data Flow
-
-1. **Import Flow**:
-   ```
-   CLI → Validate Schema → API Upload → Database + File Storage
-   ```
-
-2. **Test Flow**:
-   ```
-   CLI → API Fetch Latest Schema → Execute Tests
-   ```
+- **Database Layer (SQLite)**: Applications, Services, and versioned Schemas
+- **API Layer (FastAPI)**: Upload, validation, and retrieval endpoints
+- **CLI Layer (Click)**: `levo import` and `levo test` commands
+- **File Storage**: Organized by application/service with version-based naming
+- **Docker Support**: Containerized deployment with automated testing
 
 ## Directory Structure
 ```
-├── app/
-│   ├── models/          # Database models
-│   ├── schemas/         # Pydantic schemas
-│   ├── api/            # FastAPI endpoints
-│   ├── services/       # Business logic
-│   └── storage/        # File storage handler
+├── app/                # FastAPI application
 ├── cli/                # Click CLI commands
 ├── tests/              # Unit tests
-├── storage/            # Schema file storage
-└── database.db        # SQLite database
+├── test-inputs/        # CLI test input files
+├── storage/            # Schema file storage (git ignored)
+├── Dockerfile          # Docker configuration
+└── docker-compose.yml  # Docker Compose setup
 ```
 
 ## Quick Start
 
-### 1. Installation
-
+### Local Development
 ```bash
-# Install Python dependencies
+# Install dependencies
 pip install -r requirements.txt
-```
 
-### 2. Start the API Server
-
-```bash
-# Run the FastAPI server
+# Run the API server
 python main.py
 ```
+API available at `http://localhost:8000` with docs at `http://localhost:8000/docs`
 
-The API will be available at `http://localhost:8000` with interactive docs at `http://localhost:8000/docs`
-
-### 3. CLI Usage
-
-#### Import Schema
+### Docker Deployment
 ```bash
-# Import schema to application level
-python levo_cli.py import --spec /path/to/openapi.json --application my-app
+# Build and start with Docker Compose
+docker-compose up
+```
+API available at `http://localhost:8000` with health check at `http://localhost:8000/health`
 
-# Import schema to service level
-python levo_cli.py import --spec /path/to/openapi.yaml --application my-app --service my-service
+## CLI Usage
 
-# Replace existing schema
-python levo_cli.py import --spec /path/to/openapi.json --application my-app --replace
+### Import Schema
+```bash
+# Import to application
+python cli/levo.py import --spec /path/to/openapi.json --application my-app
+
+# Import to service
+python cli/levo.py import --spec /path/to/openapi.yaml --application my-app --service my-service
+
+# Replace existing
+python cli/levo.py import --spec /path/to/openapi.json --application my-app --replace
 ```
 
-#### Test Application/Service
+### Test CLI in Docker
 ```bash
-# Test application
-python levo_cli.py test --application my-app
+# Access container
+docker exec -it <container_name> /bin/bash
 
-# Test service
-python levo_cli.py test --application my-app --service my-service
-```
-
-#### List Schemas
-```bash
-# List all applications
-python levo_cli.py list-schemas
-
-# List schema versions for specific application
-python levo_cli.py list-schemas --application my-app
+# Run tests
+bash test-inputs/test-cli-commands.sh
 ```
 
 ## API Endpoints
 
-### Schema Management
 - `POST /api/v1/schemas/upload` - Upload new schema
 - `GET /api/v1/schemas/latest` - Get latest schema
 - `GET /api/v1/schemas/versions` - Get all versions
-- `GET /api/v1/schemas/{id}/content` - Get schema content
-
-### Application/Service Management
-- `GET /api/v1/applications` - List applications
-- `GET /api/v1/applications/{name}/services` - List services
+- `GET /health` - Container health status
 
 ## Features
 
-✅ **Schema Upload & Validation**
-- Supports JSON and YAML OpenAPI specs
-- Validates schema format before upload
-- Automatic file type detection
+**🗄️ Schema Management**
+- Multi-format support for JSON and YAML OpenAPI specifications
+- Automatic validation and version control with history tracking
+- File integrity checks using SHA-256 checksums
 
-✅ **Versioning System**
-- Automatic version incrementing
-- Maintains schema history
-- Replace existing functionality
+**🖥️ Command Line Interface** 
+- Intuitive `levo import` and `levo test` commands
+- Clean output with emojis and descriptive error handling
+- Flexible options for application and service management
 
-✅ **Database Integration**
-- SQLite database for metadata
-- Application/Service hierarchy
-- Schema versioning tracking
+**🌐 REST API**
+- High-performance FastAPI with interactive documentation
+- CORS support and built-in health monitoring
+- Auto-generated Swagger/OpenAPI docs
 
-✅ **File Storage**
-- Organized directory structure
-- SHA-256 checksums for integrity
-- Version-based file naming
+**🐳 Docker Integration**
+- Complete containerized deployment with Docker Compose
+- Automated testing during build process
+- Volume management and health check monitoring
 
-✅ **CLI Interface**
-- `levo import` command
-- `levo test` command  
-- User-friendly output with emojis
+**📁 File Organization**
+- Hierarchical Application → Service → Schema structure  
+- Smart version-based naming and path safety protection
+- Automatic cleanup of duplicates and outdated files
 
-✅ **REST API**
-- FastAPI with automatic docs
-- Comprehensive error handling
-- CORS support
-
-✅ **Unit Tests**
-- Comprehensive test coverage
-- Application and service testing
-- Schema validation testing
+**🧪 Quality Assurance**
+- Comprehensive pytest coverage with integration testing
+- Docker testing environment with CI/CD readiness
+- Build fails if tests don't pass
 
 ## Testing
 
-Run the unit tests:
-
+### Local Testing
 ```bash
-pytest tests/ -v
+python -m pytest
 ```
+All tests should pass. You may see some deprecation warnings which are expected with newer Python/package versions.
+
+### Docker Testing
+Tests run automatically during Docker build - build fails if tests fail.
 
 ## Example Usage
 
-1. **Start the API server:**
-   ```bash
-   python main.py
-   ```
+```bash
+# Start API
+python main.py
 
-2. **Import a schema:**
-   ```bash
-   python levo_cli.py import --spec examples/openapi.json --application crapi
-   ```
+# Import schema
+python cli/levo.py import --spec test-inputs/sample_ecommerce_api.json --application crapi
 
-3. **Test the application:**
-   ```bash
-   python levo_cli.py test --application crapi
-   ```
-
-4. **View all applications:**
-   ```bash
-   python levo_cli.py list-schemas
-   ```
-
-## Sample OpenAPI Schemas
-
-You can test with these public schemas:
-- https://github.com/levoai/demo-apps/blob/main/crAPI/api-specs/openapi.json
-- https://github.com/levoai/demo-apps/blob/main/MalSchema/app/openapi.yaml
-
-## System Design Details
-
-### Database Schema
-- **Applications** table: stores application metadata
-- **Services** table: stores service metadata (linked to applications)
-- **Schemas** table: stores schema metadata with versioning info
-
-### File Organization
-```
-storage/
-├── application1/
-│   ├── schema_v1.json
-│   ├── schema_v2.yaml
-│   └── service1/
-│       ├── service_schema_v1.json
-│       └── service_schema_v2.yaml
-└── application2/
-    └── schema_v1.json
+# Test with Docker
+docker-compose up
+docker exec -it <container_name> /bin/bash
+bash test-inputs/test-cli-commands.sh
 ```
 
-### Error Handling
-- Comprehensive validation at API and CLI levels
-- User-friendly error messages
-- Proper HTTP status codes
+## Docker Commands
 
-### Security Considerations
-- File type validation
-- Schema content validation
-- Path traversal protection
-- Input sanitization
+```bash
+# Build and run
+docker-compose up
 
-## Development
+# Manual build
+docker build -t levo-cli-api .
 
-The system is built with:
-- **FastAPI** for the REST API
-- **SQLAlchemy** for database ORM
-- **Click** for CLI interface
-- **Pydantic** for data validation
-- **pytest** for testing
+# Access container
+docker exec -it <container_name> /bin/bash
 
-## Future Enhancements
+# Stop containers
+docker-compose down
+```
 
-- Advanced testing capabilities
-- Schema comparison between versions
-- API documentation generation
-- Authentication and authorization
-- Schema migration tools
+## Sample Test Files
+
+Test files in `test-inputs/` directory:
+- `sample_ecommerce_api.json`
+- `sample_ecommerce_api_v2.yaml`
+- `payment_service_api.json`
+
+## Tech Stack
+
+- **FastAPI** - REST API
+- **SQLAlchemy** - Database ORM
+- **Click** - CLI interface
+- **Docker** - Containerization
+- **pytest** - Testing

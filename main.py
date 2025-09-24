@@ -29,15 +29,11 @@ def startup_event():
 
 @app.get("/")
 def read_root():
-    return {
-        "message": "Levo CLI API - Schema Upload and Versioning System",
-        "version": "1.0.0",
-        "docs": "/docs"
-    }
+    return {"message": "Levo CLI API - Schema Upload and Versioning Service"}
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy"}
+    return {"status": "healthy", "service": "levo-cli-api"}
 
 if __name__ == "__main__":
     import uvicorn
