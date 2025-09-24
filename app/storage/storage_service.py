@@ -30,23 +30,24 @@ class StorageService:
     def _validate_openapi_schema(self, content: Dict[Any, Any]) -> Tuple[bool, Optional[str]]:
         """Validate if content is a valid OpenAPI schema"""
         try:
-            # Check for required OpenAPI fields
-            if "openapi" not in content and "swagger" not in content:
-                return False, "Missing 'openapi' or 'swagger' field"
+            # Must be a dictionary
+            if not isinstance(content, dict):
+                return False, "Schema must be a valid JSON/YAML object"
 
-            if "info" not in content:
-                return False, "Missing 'info' field"
+            # Check for OpenAPI or Swagger version field
+            has_openapi = "openapi" in content
+            has_swagger = "swagger" in content
 
-            if "paths" not in content:
-                return False, "Missing 'paths' field"
+            if not (has_openapi or has_swagger):
+                return False, "Must contain 'openapi' or 'swagger' field"
 
-            # Basic version check
-            if "openapi" in content:
-                version = content["openapi"]
-                if not version.startswith(("3.", "2.")):
-                    return False, f"Unsupported OpenAPI version: {version}"
+            # Basic structure check - should have paths or components
+            has_content = any(field in content for field in ["paths", "components", "definitions"])
+            if not has_content:
+                return False, "Schema should contain 'paths', 'components', or 'definitions'"
 
             return True, None
+
         except Exception as e:
             return False, f"Schema validation error: {str(e)}"
 
