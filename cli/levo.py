@@ -121,12 +121,15 @@ def test(application: str, service: Optional[str], version: Optional[int]):
 
 @cli.command('list')
 @click.option('--application', help='Show versions for specific app')
-def list_schemas(application: Optional[str]):
+@click.option('--service', help='Filter by service name')
+def list_schemas(application: Optional[str], service: Optional[str] = None):
     """List schemas"""
 
     try:
         if application:
             params = {'application': application}
+            if service:
+                params['service'] = service
             resp = requests.get(f"{API_BASE_URL}/schemas/versions", params=params)
 
             if resp.status_code == 404:
